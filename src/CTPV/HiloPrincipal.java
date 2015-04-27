@@ -32,7 +32,7 @@ public class HiloPrincipal implements Runnable {
             ServerSocket servidor = new ServerSocket(6000);
             System.out.println("Servidor iniciado");
 
-            while (cont < 7) {
+            while (cont < 6) {
                 //Creo un cliente que se instanciara cuando uno se conecte
                 Socket cliente = new Socket();
                 cliente = servidor.accept();

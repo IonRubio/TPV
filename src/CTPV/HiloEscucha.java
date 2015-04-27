@@ -5,9 +5,9 @@
  */
 package CTPV;
 
-import java.io.BufferedReader;
+import java.awt.Component;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,7 +21,8 @@ public class HiloEscucha implements Runnable {
     private Socket cliente;
     private CTPV gui;
     private int cont;
-    private BufferedReader flujoEntrada;
+    //private BufferedReader flujoEntrada;
+    private ObjectInputStream entrada;
 
     public HiloEscucha(Socket cliente, CTPV gui, int cont) {
         this.cliente = cliente;
@@ -36,22 +37,42 @@ public class HiloEscucha implements Runnable {
             //Poner titulo a la ventana
             //Añadir al jpanel la ventanainterna
             //Hacer la ventana visible
-            
+
             VentanaInterna interna = new VentanaInterna();
+            gui.getPanel().add(interna);
             interna.setTitle("Terminal TPV " + cont);
-            gui.getjPanel3().add(interna);
             interna.setVisible(true);
-            
+
             //FLUJO DE ENTRADA
-            flujoEntrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
-            String cadena = flujoEntrada.readLine();
-            System.out.println("Recibiendo:" + cadena);
+//            flujoEntrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
+//            String cadena = flujoEntrada.readLine();
+//            System.out.println("Recibiendo:" + cadena);
+//            flujoEntrada.close();
+            entrada = new ObjectInputStream(cliente.getInputStream());
             
-            if(cadena.equals("Salir")){
-                interna.setLblClienteServido("CLIENTE SERVIDO");
+            Object aux=entrada.readObject();
+            
+            if (aux instanceof String) {
+                String cadena = (String) aux;
+                if (cadena.equalsIgnoreCase("salir")) {
+                    interna.setLblClienteServido("CLIENTE SERVIDO");
+                    System.out.println("Cliente servido");
+
+                    Component[] ventanas = gui.getPanel().getComponents();
+                    System.out.println("Componentes cargados en ventanas[]");
+
+                    gui.getPanel().remove(interna);
+                    System.out.println("Remove hecho");
+                    gui.getPanel().repaint();
+                    System.out.println("Repaint hecho");
+                    //Thread.sleep(500);
+
+                }
             }
-            
         } catch (IOException ex) {
+            System.err.println("ERROR ENTRADA SALIDA");
+            Logger.getLogger(HiloEscucha.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(HiloEscucha.class.getName()).log(Level.SEVERE, null, ex);
         }
 

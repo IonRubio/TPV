@@ -12,15 +12,13 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.InterruptedIOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,8 +33,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.TransferHandler;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -61,6 +57,10 @@ public class TPVJFrame extends JFrame {
 
     public Socket cliente;
     PrintWriter flujoSalida;
+    
+    
+    
+    ObjectOutputStream salida;
 
     //---------- CONSTRUCTOR
     /**
@@ -85,20 +85,29 @@ public class TPVJFrame extends JFrame {
         cliente = new Socket(host, puerto);
     }
 
-//    public void formWindowClosing(java.awt.event.WindowEvent evt) throws IOException {
-//        salirTPV();
-//    }
-
     public void salirTPV() throws IOException {
         //Poner el texto en la copia del cliente que hay en el servidor
 
         //CREO FLUJO DE SALIDA       
-        flujoSalida = new PrintWriter(cliente.getOutputStream(), true);
-        //envio cadena al Servidor para que sepa que se sale
-        flujoSalida.println("Salir");
-
-        flujoSalida.close();
-        cliente.close();
+//        flujoSalida = new PrintWriter(cliente.getOutputStream(), true);
+//        //envio cadena al Servidor para que sepa que se sale
+//        flujoSalida.println("salir");
+//
+//        flujoSalida.close();
+//        cliente.close();
+//        
+        
+        //Con objetos
+        salida=new ObjectOutputStream(cliente.getOutputStream());
+        String mandarSalir="Salir";
+        salida.writeObject(mandarSalir);
+        
+        
+        
+        
+        
+        
+        
     }
 
     //----------METODOS
@@ -109,12 +118,28 @@ public class TPVJFrame extends JFrame {
         jPanelTPV = new JPanel(new BorderLayout(10, 10));
         jPanelTPV.setBorder(new EmptyBorder(15, 15, 15, 15));
         jPanelTPV.setBackground(AZUL_CLARO);
+
         crearEncabezado();
         crearZonaProductos();
         crearZonaFactura();
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
+
         add(jPanelTPV);
         pack();
+    }
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {
+        try {
+            System.out.println("CERRANDO VENTANA");
+            salirTPV();
+        } catch (IOException ex) {
+            Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -360,18 +385,27 @@ public class TPVJFrame extends JFrame {
         listaPedidos.put(nombre, nuevoPedido);
         actualizarTabla();
         actualizarTotal();
+        //System.out.println("Entra ");
     }
 
     public void actualizarTabla() {
-
-        int a = modeloTabla.getRowCount() - 1;
-        for (int i = a; i >= 0; i--) {
-            modeloTabla.removeRow(i);
-        }
-
-        for (String string : listaPedidos.keySet()) {
-            modeloTabla.addRow(listaPedidos.get(string).getProducto());
-        }
+        try {
+            int a = modeloTabla.getRowCount() - 1;
+            for (int i = a; i >= 0; i--) {
+                modeloTabla.removeRow(i);
+            }
+            for (String string : listaPedidos.keySet()) {
+                modeloTabla.addRow(listaPedidos.get(string).getProducto());
+            }
+            
+            ObjectOutputStream oos = new ObjectOutputStream(cliente.getOutputStream());
+            
+            oos.writeObject(modeloTabla);
+            oos.close();
+        } 
+        catch (Exception ex) {
+            Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } 
     }
 
     public void actualizarTotal() {
@@ -383,6 +417,11 @@ public class TPVJFrame extends JFrame {
         BigDecimal big = new BigDecimal(val);
         big = big.setScale(2, RoundingMode.HALF_UP);
         jLabelTotal.setText("" + big);
+        // Enviar modeloTabla
+        
+        
+        
+        
     }
 
     private void eliminar() {
