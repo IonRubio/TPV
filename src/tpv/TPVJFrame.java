@@ -392,7 +392,17 @@ public class TPVJFrame extends JFrame {
 
             Vector v=modelo.getDataVector();
             
-            salida.writeObject(v);
+            Vector columnas=new Vector();
+            for(int i=0;i<modelo.getColumnCount();i++){
+                columnas.add(modelo.getColumnName(i));
+            }
+            
+            Vector[] array=new Vector[2];
+            array[0]=v;
+            array[1]=columnas;
+            
+            
+            salida.writeObject(array);
             salida.flush();
             salida.reset();
 

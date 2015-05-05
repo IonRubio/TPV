@@ -80,10 +80,26 @@ public class HiloEscucha implements Runnable {
             } else /*if (aux instanceof java.util.Vector) */{
                 System.out.println("ENTRO!!! Vector recibido");
                 
+                Vector auxVector,auxColumnas;
+                
+                Vector[] arrayRecibido= (Vector[])aux;
+                
+                auxVector=arrayRecibido[0];
+                auxColumnas=arrayRecibido[1];
+                
+                
                 JTable tabla=interna.getTable();
                 DefaultTableModel modelo=(DefaultTableModel) tabla.getModel();
-                Vector v=(Vector) aux;
-                System.out.println(v.toString());
+                
+                
+                System.out.println(auxVector.toString());
+                
+                JTable tablaInterna=interna.getTable();
+                DefaultTableModel modeloInterno=(DefaultTableModel) tablaInterna.getModel();
+                
+                                
+                modeloInterno.setDataVector(auxVector, auxColumnas);
+                
                 
                 
             }
