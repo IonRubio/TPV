@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package tpv;
 
 import java.awt.BorderLayout;
@@ -12,8 +7,6 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -22,6 +15,7 @@ import java.math.RoundingMode;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -57,9 +51,7 @@ public class TPVJFrame extends JFrame {
 
     public Socket cliente;
     PrintWriter flujoSalida;
-    
-    
-    
+
     ObjectOutputStream salida;
 
     //---------- CONSTRUCTOR
@@ -96,18 +88,12 @@ public class TPVJFrame extends JFrame {
 //        flujoSalida.close();
 //        cliente.close();
 //        
-        
         //Con objetos
-        salida=new ObjectOutputStream(cliente.getOutputStream());
-        String mandarSalir="Salir";
+        salida = new ObjectOutputStream(cliente.getOutputStream());
+        String mandarSalir = "Salir";
         salida.writeObject(mandarSalir);
-        
-        
-        
-        
-        
-        
-        
+        salida.close();
+
     }
 
     //----------METODOS
@@ -397,15 +383,22 @@ public class TPVJFrame extends JFrame {
             for (String string : listaPedidos.keySet()) {
                 modeloTabla.addRow(listaPedidos.get(string).getProducto());
             }
+
+            salida = new ObjectOutputStream(cliente.getOutputStream());
+            //System.out.println("Apunto de mandar el modelo de tabla");
+            System.out.println("Mandar VECTOR");
             
-            ObjectOutputStream oos = new ObjectOutputStream(cliente.getOutputStream());
+            DefaultTableModel modelo = (DefaultTableModel) tabla.getModel();
+
+            Vector v=modelo.getDataVector();
             
-            oos.writeObject(modeloTabla);
-            oos.close();
-        } 
-        catch (Exception ex) {
+            salida.writeObject(v);
+            salida.flush();
+            salida.reset();
+
+        } catch (Exception ex) {
             Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
-        } 
+        }
     }
 
     public void actualizarTotal() {
@@ -418,10 +411,7 @@ public class TPVJFrame extends JFrame {
         big = big.setScale(2, RoundingMode.HALF_UP);
         jLabelTotal.setText("" + big);
         // Enviar modeloTabla
-        
-        
-        
-        
+
     }
 
     private void eliminar() {

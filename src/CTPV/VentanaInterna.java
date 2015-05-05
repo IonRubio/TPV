@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package CTPV;
 
 import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -17,14 +18,24 @@ public class VentanaInterna extends javax.swing.JInternalFrame {
     /**
      * Creates new form VentanaInterna
      */
+    private DefaultTableModel modeloTabla;
+
     public VentanaInterna() {
         initComponents();
+        
+        modeloTabla = new DefaultTableModel();
+
+        //Añadimos las columnas a la tabla
+        modeloTabla.addColumn("Productos");
+        modeloTabla.addColumn("Cantidad");
+        modeloTabla.addColumn("Sub-total");
+        jTable1.setModel(modeloTabla);
     }
 
     public void setLblClienteServido(String texto) {
         lblClienteServido.setText(texto);
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -48,13 +59,10 @@ public class VentanaInterna extends javax.swing.JInternalFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Productos", "Cantidad", "Sub-Total"
             }
         ));
         jScrollPane2.setViewportView(jTable1);
@@ -140,6 +148,14 @@ public class VentanaInterna extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    public JTable getTable() {
+        return jTable1;
+    }
+
+    public void setTable(JTable tabla) {
+        jTable1 = tabla;
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

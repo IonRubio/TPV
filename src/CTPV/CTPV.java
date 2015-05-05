@@ -1,9 +1,11 @@
 package CTPV;
 
 import java.awt.Component;
+import java.awt.Image;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -22,6 +24,8 @@ public class CTPV extends javax.swing.JFrame {
         //Ventana maximizada desde el inicio
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         //Lamamos al metodo que hara que el servidor escuche
+        ImageIcon image = new ImageIcon("..\\TPV\\src\\iconos\\tpv.png");
+        this.setIconImage(image.getImage());
         arrancaHiloPrincipal();
     }
 
@@ -37,6 +41,8 @@ public class CTPV extends javax.swing.JFrame {
         jDesktopPane1 = new javax.swing.JDesktopPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("CTPV");
+        setForeground(java.awt.Color.white);
         setMinimumSize(new java.awt.Dimension(1300, 700));
 
         jDesktopPane1.setLayout(new java.awt.GridLayout(2, 3));
@@ -97,7 +103,7 @@ public class CTPV extends javax.swing.JFrame {
     }
 
     public JDesktopPane getPanel() {
-        System.out.println("Dentro getDesktopPane");
+        //System.out.println("Dentro getDesktopPane");
         return jDesktopPane1;
     }
     

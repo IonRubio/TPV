@@ -9,8 +9,12 @@ import java.awt.Component;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -48,11 +52,16 @@ public class HiloEscucha implements Runnable {
 //            String cadena = flujoEntrada.readLine();
 //            System.out.println("Recibiendo:" + cadena);
 //            flujoEntrada.close();
+
             entrada = new ObjectInputStream(cliente.getInputStream());
-            
-            Object aux=entrada.readObject();
-            
+
+            Object aux = entrada.readObject();
+
             if (aux instanceof String) {
+
+                System.out.println("Recojo el objeto y comparo su tipo");
+                System.out.println(aux.getClass());
+
                 String cadena = (String) aux;
                 if (cadena.equalsIgnoreCase("salir")) {
                     interna.setLblClienteServido("CLIENTE SERVIDO");
@@ -68,6 +77,15 @@ public class HiloEscucha implements Runnable {
                     //Thread.sleep(500);
 
                 }
+            } else /*if (aux instanceof java.util.Vector) */{
+                System.out.println("ENTRO!!! Vector recibido");
+                
+                JTable tabla=interna.getTable();
+                DefaultTableModel modelo=(DefaultTableModel) tabla.getModel();
+                Vector v=(Vector) aux;
+                System.out.println(v.toString());
+                
+                
             }
         } catch (IOException ex) {
             System.err.println("ERROR ENTRADA SALIDA");
