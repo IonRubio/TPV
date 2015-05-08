@@ -10,21 +10,14 @@ import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-/**
- *
- * @author Usuario
- */
 public class CTPV extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Principal
-     */
     public CTPV() {
         initComponents();
         //Ventana maximizada desde el inicio
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         //Lamamos al metodo que hara que el servidor escuche
-        ImageIcon image = new ImageIcon("..\\TPV\\src\\iconos\\tpv.png");
+        ImageIcon image = new ImageIcon(getClass().getResource("/iconos/tpv.png"));
         this.setIconImage(image.getImage());
         arrancaHiloPrincipal();
     }
@@ -106,7 +99,7 @@ public class CTPV extends javax.swing.JFrame {
         //System.out.println("Dentro getDesktopPane");
         return jDesktopPane1;
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDesktopPane jDesktopPane1;
     // End of variables declaration//GEN-END:variables

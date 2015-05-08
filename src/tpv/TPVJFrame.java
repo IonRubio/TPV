@@ -75,21 +75,11 @@ public class TPVJFrame extends JFrame {
         String host = "localhost";
         int puerto = 6000;
         cliente = new Socket(host, puerto);
+        salida = new ObjectOutputStream(cliente.getOutputStream());
     }
 
     public void salirTPV() throws IOException {
-        //Poner el texto en la copia del cliente que hay en el servidor
-
-        //CREO FLUJO DE SALIDA       
-//        flujoSalida = new PrintWriter(cliente.getOutputStream(), true);
-//        //envio cadena al Servidor para que sepa que se sale
-//        flujoSalida.println("salir");
-//
-//        flujoSalida.close();
-//        cliente.close();
-//        
-        //Con objetos
-        salida = new ObjectOutputStream(cliente.getOutputStream());
+        
         String mandarSalir = "Salir";
         salida.writeObject(mandarSalir);
         salida.close();
@@ -384,24 +374,24 @@ public class TPVJFrame extends JFrame {
                 modeloTabla.addRow(listaPedidos.get(string).getProducto());
             }
 
-            salida = new ObjectOutputStream(cliente.getOutputStream());
             //System.out.println("Apunto de mandar el modelo de tabla");
-            System.out.println("Mandar VECTOR");
+            //System.out.println("Manda VECTOR");
             
-            DefaultTableModel modelo = (DefaultTableModel) tabla.getModel();
-
-            Vector v=modelo.getDataVector();
             
-            Vector columnas=new Vector();
-            for(int i=0;i<modelo.getColumnCount();i++){
-                columnas.add(modelo.getColumnName(i));
+            //Creo un vector que contenga los productos que se van seleccionando
+            Vector v = modeloTabla.getDataVector();
+            //Otro vector para los encabezados, necesario para el set del modelo mas adelante
+            Vector columnas = new Vector();
+            for (int i = 0; i < modeloTabla.getColumnCount(); i++) {
+                columnas.add(modeloTabla.getColumnName(i));
             }
             
-            Vector[] array=new Vector[2];
-            array[0]=v;
-            array[1]=columnas;
-            
-            
+            //Creo un array de vectores para mandarle conjuntamente los productos y los encabezados
+            //Luego se recojera como un array de vectores tambien
+            Vector[] array = new Vector[2];
+            array[0] = v;
+            array[1] = columnas;
+
             salida.writeObject(array);
             salida.flush();
             salida.reset();
@@ -420,8 +410,7 @@ public class TPVJFrame extends JFrame {
         BigDecimal big = new BigDecimal(val);
         big = big.setScale(2, RoundingMode.HALF_UP);
         jLabelTotal.setText("" + big);
-        // Enviar modeloTabla
-
+        
     }
 
     private void eliminar() {

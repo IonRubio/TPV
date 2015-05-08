@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package CTPV;
 
 import java.awt.Component;
@@ -16,22 +11,21 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author Usuario
- */
 public class HiloEscucha implements Runnable {
 
     private Socket cliente;
     private CTPV gui;
     private int cont;
-    //private BufferedReader flujoEntrada;
     private ObjectInputStream entrada;
+    private boolean seguirEnBloque;
+    private HiloPrincipal hp;
 
-    public HiloEscucha(Socket cliente, CTPV gui, int cont) {
+    public HiloEscucha(Socket cliente, CTPV gui, int cont, HiloPrincipal hp) {
         this.cliente = cliente;
         this.cont = cont;
         this.gui = gui;
+        this.hp = hp;
+        seguirEnBloque = true;
     }
 
     @Override
@@ -47,62 +41,61 @@ public class HiloEscucha implements Runnable {
             interna.setTitle("Terminal TPV " + cont);
             interna.setVisible(true);
 
-            //FLUJO DE ENTRADA
-//            flujoEntrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
-//            String cadena = flujoEntrada.readLine();
-//            System.out.println("Recibiendo:" + cadena);
-//            flujoEntrada.close();
-
             entrada = new ObjectInputStream(cliente.getInputStream());
 
-            Object aux = entrada.readObject();
+            //Mientras el cliente no cierre su TPV, seguira escuchando
+            while (seguirEnBloque) {
+                Object aux = entrada.readObject();
 
-            if (aux instanceof String) {
+                if (aux instanceof String) {
 
-                System.out.println("Recojo el objeto y comparo su tipo");
-                System.out.println(aux.getClass());
+                    //Recojo el objeto y comparo su tipo
+                    System.out.println(aux.getClass());
 
-                String cadena = (String) aux;
-                if (cadena.equalsIgnoreCase("salir")) {
-                    interna.setLblClienteServido("CLIENTE SERVIDO");
-                    System.out.println("Cliente servido");
+                    String cadena = (String) aux;
 
-                    Component[] ventanas = gui.getPanel().getComponents();
-                    System.out.println("Componentes cargados en ventanas[]");
+                    //Si se le pasa salir => se cierra el TPV
+                    if (cadena.equalsIgnoreCase("salir")) {
+                        interna.setLblClienteServido("CLIENTE SERVIDO");
+                        System.out.println("Cliente servido");
 
-                    gui.getPanel().remove(interna);
-                    System.out.println("Remove hecho");
-                    gui.getPanel().repaint();
-                    System.out.println("Repaint hecho");
-                    //Thread.sleep(500);
+                        Component[] ventanas = gui.getPanel().getComponents();
+                        System.out.println("Componentes cargados en ventanas[]");
+
+                        gui.getPanel().remove(interna);
+                        System.out.println("Remove hecho");
+                        gui.getPanel().repaint();
+                        System.out.println("Repaint hecho");
+
+                        seguirEnBloque = false;
+                        hp.restarCont();
+
+                    }
+                } else /*if (aux instanceof java.util.Vector) */ {
+                    System.out.println("ENTRO!!! Vector recibido");
+
+                    //Dos vectores auxiliares para recojer los datos enviados desde el TPV
+                    //1º Los productos seleccionados
+                    //2º Los encabezados
+                    Vector auxVector, auxColumnas;
+
+                    Vector[] arrayRecibido = (Vector[]) aux;
+
+                    auxVector = arrayRecibido[0];
+                    auxColumnas = arrayRecibido[1];
+
+                    System.out.println(auxVector.toString());
+
+                    //Variables para tener a mano la tabla de la VentanaInterna y su modelo
+                    JTable tablaInterna = interna.getTable();
+                    DefaultTableModel modeloInterno = (DefaultTableModel) tablaInterna.getModel();
+
+                    //Se actualiza el modelo de la VentanaInterna con los productos recibidos y con los encabezados
+                    modeloInterno.setDataVector(auxVector, auxColumnas);
 
                 }
-            } else /*if (aux instanceof java.util.Vector) */{
-                System.out.println("ENTRO!!! Vector recibido");
-                
-                Vector auxVector,auxColumnas;
-                
-                Vector[] arrayRecibido= (Vector[])aux;
-                
-                auxVector=arrayRecibido[0];
-                auxColumnas=arrayRecibido[1];
-                
-                
-                JTable tabla=interna.getTable();
-                DefaultTableModel modelo=(DefaultTableModel) tabla.getModel();
-                
-                
-                System.out.println(auxVector.toString());
-                
-                JTable tablaInterna=interna.getTable();
-                DefaultTableModel modeloInterno=(DefaultTableModel) tablaInterna.getModel();
-                
-                                
-                modeloInterno.setDataVector(auxVector, auxColumnas);
-                
-                
-                
             }
+
         } catch (IOException ex) {
             System.err.println("ERROR ENTRADA SALIDA");
             Logger.getLogger(HiloEscucha.class.getName()).log(Level.SEVERE, null, ex);
@@ -111,5 +104,6 @@ public class HiloEscucha implements Runnable {
         }
 
     }
-
+    
+    
 }

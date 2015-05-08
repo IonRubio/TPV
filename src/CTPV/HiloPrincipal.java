@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package CTPV;
 
 import java.io.IOException;
@@ -12,10 +7,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JDesktopPane;
 
-/**
- *
- * @author Usuario
- */
 public class HiloPrincipal implements Runnable {
 
     private CTPV gui;
@@ -32,13 +23,13 @@ public class HiloPrincipal implements Runnable {
             ServerSocket servidor = new ServerSocket(6000);
             System.out.println("Servidor iniciado");
 
-            while (cont < 6) {
+            while (cont <= 6) {
                 //Creo un cliente que se instanciara cuando uno se conecte
                 Socket cliente = new Socket();
                 cliente = servidor.accept();
                 
                 //Le paso lo necesario a la clase HiloEscucha para que cree la ventana del cliente
-                HiloEscucha escucha=new HiloEscucha(cliente, gui, cont);
+                HiloEscucha escucha=new HiloEscucha(cliente, gui, cont, this);
                 
                 Thread th=new Thread(escucha);
                 th.start();
@@ -50,4 +41,19 @@ public class HiloPrincipal implements Runnable {
         }
     }
 
+    public void restarCont(){
+        cont--;
+    }
+
+    public int getCont() {
+        return cont;
+    }
+
+    public void setCont(int cont) {
+        this.cont = cont;
+    }
+    
+    
+    
+    
 }
