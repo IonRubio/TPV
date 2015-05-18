@@ -178,7 +178,11 @@ public class VentanaInterna extends javax.swing.JInternalFrame {
         jTable1 = tabla;
     }
 
-
+    public DefaultTableModel getModeloTabla() {
+        return modeloTabla;
+    }
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

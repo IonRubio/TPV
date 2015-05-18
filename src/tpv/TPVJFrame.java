@@ -77,6 +77,11 @@ public class TPVJFrame extends JFrame {
         cliente = new Socket(host, puerto);
         salida = new ObjectOutputStream(cliente.getOutputStream());
     }
+    
+    public double getTotal(){
+        double d=Double.parseDouble(jLabelTotal.getText());
+        return d;
+    }
 
     public void salirTPV() throws IOException {
         
@@ -376,8 +381,7 @@ public class TPVJFrame extends JFrame {
 
             //System.out.println("Apunto de mandar el modelo de tabla");
             //System.out.println("Manda VECTOR");
-            
-            
+                        
             //Creo un vector que contenga los productos que se van seleccionando
             Vector v = modeloTabla.getDataVector();
             //Otro vector para los encabezados, necesario para el set del modelo mas adelante
@@ -388,13 +392,15 @@ public class TPVJFrame extends JFrame {
             
             //Creo un array de vectores para mandarle conjuntamente los productos y los encabezados
             //Luego se recojera como un array de vectores tambien
-            Vector[] array = new Vector[2];
+            Vector[] array = new Vector[3];
             array[0] = v;
             array[1] = columnas;
 
             salida.writeObject(array);
             salida.flush();
             salida.reset();
+            
+            
 
         } catch (Exception ex) {
             Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);

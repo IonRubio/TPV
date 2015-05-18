@@ -1,13 +1,15 @@
 package CTPV;
 
 import java.awt.Component;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Calendar;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
@@ -16,6 +18,7 @@ public class HiloEscucha implements Runnable {
     private Socket cliente;
     private CTPV gui;
     private int cont;
+    private ObjectOutputStream salida;
     private ObjectInputStream entrada;
     private boolean seguirEnBloque;
     private HiloPrincipal hp;
@@ -57,22 +60,37 @@ public class HiloEscucha implements Runnable {
                     //Si se le pasa salir => se cierra el TPV
                     if (cadena.equalsIgnoreCase("salir")) {
                         interna.setLblClienteServido("CLIENTE SERVIDO");
-                        System.out.println("Cliente servido");
 
                         Component[] ventanas = gui.getPanel().getComponents();
-                        System.out.println("Componentes cargados en ventanas[]");
 
                         gui.getPanel().remove(interna);
-                        System.out.println("Remove hecho");
                         gui.getPanel().repaint();
-                        System.out.println("Repaint hecho");
 
                         seguirEnBloque = false;
+
+                        //Inteneto modificar el contador
                         hp.restarCont();
+
+                        hp.setHaySitio(true);
+                        System.out.println("Modifico haysitio a true: " + hp.getHaySitio());
+
+                        //Escribir en fichero ventas.dat
+                        String ruta = "C:\\Users\\Usuario\\Documents\\NetBeansProjects\\ventas.dat";
+                        salida = new ObjectOutputStream(new FileOutputStream(ruta, true));
+                        //System.out.println(interna.getModeloTabla().getDataVector().toString());
+
+                        Calendar cal = Calendar.getInstance();                        
+                        Fecha fecha=new Fecha(cal.get(cal.HOUR_OF_DAY), cal.get(cal.MINUTE),
+                                cal.get(cal.DATE), cal.get(cal.MONTH), cal.get(cal.YEAR));
+                        
+                        //System.out.println(fecha.toString());
+                        
+                        salida.writeObject(interna.getTable().getModel().toString());
+                        salida.writeObject(fecha);
+                        salida.close();
 
                     }
                 } else /*if (aux instanceof java.util.Vector) */ {
-                    System.out.println("ENTRO!!! Vector recibido");
 
                     //Dos vectores auxiliares para recojer los datos enviados desde el TPV
                     //1º Los productos seleccionados
@@ -104,6 +122,5 @@ public class HiloEscucha implements Runnable {
         }
 
     }
-    
-    
+
 }

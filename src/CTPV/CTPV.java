@@ -20,6 +20,9 @@ public class CTPV extends javax.swing.JFrame {
         ImageIcon image = new ImageIcon(getClass().getResource("/iconos/tpv.png"));
         this.setIconImage(image.getImage());
         arrancaHiloPrincipal();
+
+        arrancarHiloCambiosVentas();
+
     }
 
     /**
@@ -107,6 +110,14 @@ public class CTPV extends javax.swing.JFrame {
     private void arrancaHiloPrincipal() {
         //Creo objeto hilo principal
         HiloPrincipal hilo = new HiloPrincipal(this);
+        //Creo un hilo del objeto de HiloPrincipal 
+        Thread th = new Thread(hilo);
+        th.start();
+    }
+
+    private void arrancarHiloCambiosVentas() {
+        //Creo objeto hilo principal
+        HiloCambiosVentas hilo = new HiloCambiosVentas();
         //Creo un hilo del objeto de HiloPrincipal 
         Thread th = new Thread(hilo);
         th.start();
