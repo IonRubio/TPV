@@ -30,7 +30,7 @@ public class HiloPrincipal implements Runnable {
 
             while (haySitio || cont <= max) {
 
-                System.out.println("Entro en while, hay sitio?: " + haySitio);
+                //System.out.println("Entro en while, hay sitio?: " + haySitio);
 
                 //Creo un cliente que se instanciara cuando uno se conecte
                 Socket cliente = new Socket();
@@ -41,13 +41,13 @@ public class HiloPrincipal implements Runnable {
 
                 if (cont == max) {
                     haySitio = false;
-                    System.out.println("ES IGUAL A MAX");
+                    //System.out.println("ES IGUAL A MAX");
                 }
 
                 Thread th = new Thread(escucha);
                 th.start();
 
-                System.out.println("Acabo while: " + haySitio);
+                //System.out.println("Acabo while: " + haySitio);
                 cont++;
             }
         } catch (IOException ex) {

@@ -1,18 +1,25 @@
 package CTPV;
 
-import java.awt.Component;
-import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 
-public class CTPV extends javax.swing.JFrame {
+public class CTPV extends javax.swing.JFrame implements ActionListener {
+
+    private JMenuBar mb;
+    private JMenu menu1;
 
     public CTPV() {
+        mb = new JMenuBar();
+        setJMenuBar(mb);
+        menu1 = new JMenu("Comunicar con Jefe");
+        menu1.addActionListener(this);
+        mb.add(menu1);
         initComponents();
         //Ventana maximizada desde el inicio
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -20,8 +27,6 @@ public class CTPV extends javax.swing.JFrame {
         ImageIcon image = new ImageIcon(getClass().getResource("/iconos/tpv.png"));
         this.setIconImage(image.getImage());
         arrancaHiloPrincipal();
-
-        arrancarHiloCambiosVentas();
 
     }
 
@@ -121,6 +126,13 @@ public class CTPV extends javax.swing.JFrame {
         //Creo un hilo del objeto de HiloPrincipal 
         Thread th = new Thread(hilo);
         th.start();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+        arrancarHiloCambiosVentas();
+        
     }
 
 }

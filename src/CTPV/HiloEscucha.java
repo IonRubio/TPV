@@ -1,12 +1,17 @@
 package CTPV;
 
 import java.awt.Component;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,10 +23,10 @@ public class HiloEscucha implements Runnable {
     private Socket cliente;
     private CTPV gui;
     private int cont;
-    private ObjectOutputStream salida;
     private ObjectInputStream entrada;
     private boolean seguirEnBloque;
     private HiloPrincipal hp;
+    private BufferedWriter writer;
 
     public HiloEscucha(Socket cliente, CTPV gui, int cont, HiloPrincipal hp) {
         this.cliente = cliente;
@@ -53,8 +58,7 @@ public class HiloEscucha implements Runnable {
                 if (aux instanceof String) {
 
                     //Recojo el objeto y comparo su tipo
-                    System.out.println(aux.getClass());
-
+                    //System.out.println(aux.getClass());
                     String cadena = (String) aux;
 
                     //Si se le pasa salir => se cierra el TPV
@@ -72,23 +76,66 @@ public class HiloEscucha implements Runnable {
                         hp.restarCont();
 
                         hp.setHaySitio(true);
-                        System.out.println("Modifico haysitio a true: " + hp.getHaySitio());
+                        //System.out.println("Modifico haysitio a true: " + hp.getHaySitio());
 
                         //Escribir en fichero ventas.dat
-                        String ruta = "C:\\Users\\Usuario\\Documents\\NetBeansProjects\\ventas.dat";
-                        salida = new ObjectOutputStream(new FileOutputStream(ruta, true));
+                        File fichero = new File("ventas.dat");
+                        if (!fichero.exists()) {
+                            fichero.createNewFile();
+                        }
+                        FileWriter fw = new FileWriter(fichero.getAbsoluteFile(),true);
+                        writer = new BufferedWriter(fw);
+
                         //System.out.println(interna.getModeloTabla().getDataVector().toString());
-
-                        Calendar cal = Calendar.getInstance();                        
-                        Fecha fecha=new Fecha(cal.get(cal.HOUR_OF_DAY), cal.get(cal.MINUTE),
+                        
+                        //Obtengo el modelo de la tabla para sacar sus filas y columnas y asi luego recorrer
+                        //con facilidad el modelo
+                        DefaultTableModel modeloTabla = interna.getModeloTabla();
+                        int filas = modeloTabla.getRowCount();
+                        int columnas = modeloTabla.getColumnCount();
+                        
+                        //3 variables que seran las que estan dentro de cada linea del modelo
+                        String producto = "";
+                        int cantidad = 0;
+                        float precioTotal = 0;
+                        
+                        //Creo un arrayList donde guardo los productos comprados
+                        ArrayList<ProductoAuxiliar> array = new ArrayList<>();
+                        //Recorro filas y columnas y dependiendo de que lea le asigno una variable u otra
+                        for (int i = 0; i < filas; i++) {
+                            for (int j = 0; j < columnas; j++) {
+                                if (j == 0) {
+                                    producto = (String) modeloTabla.getValueAt(i, j);
+                                }
+                                if (j == 1) {
+                                    cantidad = Integer.parseInt((String) modeloTabla.getValueAt(i, j));
+                                }
+                                if (j == 2) {
+                                    precioTotal = Float.parseFloat((String) modeloTabla.getValueAt(i, j));
+                                }
+                            }
+                            array.add(new ProductoAuxiliar(producto, cantidad, precioTotal));
+                        }
+                        //Obtengo la fecha
+                        Calendar cal = Calendar.getInstance();
+                        Fecha fecha = new Fecha(cal.get(cal.HOUR_OF_DAY), cal.get(cal.MINUTE),
                                 cal.get(cal.DATE), cal.get(cal.MONTH), cal.get(cal.YEAR));
-                        
-                        //System.out.println(fecha.toString());
-                        
-                        salida.writeObject(interna.getTable().getModel().toString());
-                        salida.writeObject(fecha);
-                        salida.close();
 
+                        //System.out.println(fecha.toString());
+                        String escribir;
+                        //Recorro el arraylist y escribo en el fichero
+                        Iterator it = array.iterator();
+                        while (it.hasNext()) {
+                            ProductoAuxiliar pa = (ProductoAuxiliar) it.next();
+                            //System.out.println(pa.toString());
+
+                            escribir = pa.toString() + " Fecha: " + fecha.toString();
+
+                            writer.write(escribir, 0, escribir.length());
+                            writer.newLine();
+
+                        }
+                        writer.close();
                     }
                 } else /*if (aux instanceof java.util.Vector) */ {
 
@@ -102,8 +149,7 @@ public class HiloEscucha implements Runnable {
                     auxVector = arrayRecibido[0];
                     auxColumnas = arrayRecibido[1];
 
-                    System.out.println(auxVector.toString());
-
+                    //System.out.println(auxVector.toString());
                     //Variables para tener a mano la tabla de la VentanaInterna y su modelo
                     JTable tablaInterna = interna.getTable();
                     DefaultTableModel modeloInterno = (DefaultTableModel) tablaInterna.getModel();

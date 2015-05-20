@@ -379,9 +379,6 @@ public class TPVJFrame extends JFrame {
                 modeloTabla.addRow(listaPedidos.get(string).getProducto());
             }
 
-            //System.out.println("Apunto de mandar el modelo de tabla");
-            //System.out.println("Manda VECTOR");
-                        
             //Creo un vector que contenga los productos que se van seleccionando
             Vector v = modeloTabla.getDataVector();
             //Otro vector para los encabezados, necesario para el set del modelo mas adelante
