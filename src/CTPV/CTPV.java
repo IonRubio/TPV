@@ -8,18 +8,28 @@ import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 
-public class CTPV extends javax.swing.JFrame implements ActionListener {
+public class CTPV extends javax.swing.JFrame{
 
     private JMenuBar mb;
     private JMenu menu1;
+    private JMenuItem comunicar;
 
     public CTPV() {
         mb = new JMenuBar();
         setJMenuBar(mb);
         menu1 = new JMenu("Comunicar con Jefe");
-        menu1.addActionListener(this);
         mb.add(menu1);
+        comunicar = new JMenuItem("Transferir Datos");
+        menu1.add(comunicar);
+        comunicar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                System.out.println("Transfiriendo Datos .....");
+                arrancarHiloCambiosVentas();
+            }
+        });
+        
         initComponents();
         //Ventana maximizada desde el inicio
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -126,13 +136,6 @@ public class CTPV extends javax.swing.JFrame implements ActionListener {
         //Creo un hilo del objeto de HiloPrincipal 
         Thread th = new Thread(hilo);
         th.start();
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-        arrancarHiloCambiosVentas();
-        
     }
 
 }

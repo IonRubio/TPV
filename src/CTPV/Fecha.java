@@ -61,7 +61,7 @@ public class Fecha {
 
     @Override
     public String toString() {
-        return dia+"/"+mes+"/"+año+" - "+horas+":"+minutos;
+        return dia+"/"+mes+"/"+año+" Hora: "+horas+":"+minutos;
     }
     
     
