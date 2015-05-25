@@ -77,11 +77,11 @@ public class HiloCambiosVentas implements Runnable {
                     } else if (h >= 16 && h <= 20) {
                         tardes++;
                     }
-
                 }
 
                 //Preparo el mensaje, lo mando en 3 lineas
                 mensaje = lineas + "#" + mañanas + "#" + tardes;
+                System.out.println("Numero de lineas: "+lineas+"\nMañanas: "+mañanas+"\nTardes: "+tardes);
 
                 //Recupero clave publica almacenada para encriptar el mensaje
                 //Lectura de la clave
@@ -89,19 +89,18 @@ public class HiloCambiosVentas implements Runnable {
                 byte[] bufferPub = new byte[in.available()];
                 in.read(bufferPub);
                 in.close();
+                
                 //Recuperacion de la clave
                 KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                 KeySpec keySpec = new X509EncodedKeySpec(bufferPub);
                 PublicKey clavePublica = keyFactory.generatePublic(keySpec);
+                
                 //Se encriptan los datos
                 Cipher rsa = Cipher.getInstance("RSA/ECB/PKCS1Padding");
                 rsa.init(Cipher.ENCRYPT_MODE, clavePublica);
-                byte[] encriptado = new byte[1024];
+                byte[] encriptado;
                 encriptado = rsa.doFinal(mensaje.getBytes());
 
-                System.out.println("Mensaje cifrado listo para enviar");
-                System.out.println(encriptado);
-                
                 //System.out.println(datos);
                 paquete = new DatagramPacket(encriptado, encriptado.length, dir, puerto);
                 //paquete = new DatagramPacket(mensaje.getBytes(), mensaje.length(), dir, puerto);

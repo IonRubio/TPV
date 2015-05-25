@@ -25,7 +25,7 @@ public class HiloRecibirDatos implements Runnable {
 
     DatagramSocket servidor;
     DatagramPacket paquete;
-    byte[] mandados = new byte[1024];
+    byte[] mandados = new byte[128];
     String cadena;
     MV monitor;
 
@@ -44,9 +44,6 @@ public class HiloRecibirDatos implements Runnable {
 
                 byte[] recibido = paquete.getData();
 
-                System.out.println("TEXTO CIFRADO:");
-                System.out.println(recibido);
-
                 //Recuperar clave privada
                 FileInputStream fis = new FileInputStream("Clave.privada");
                 int numBtyes = fis.available();
@@ -64,15 +61,13 @@ public class HiloRecibirDatos implements Runnable {
                 rsa.init(Cipher.DECRYPT_MODE, clavePrivada);
                 byte[] bytesDesencriptados = rsa.doFinal(recibido);
                 String textoDesencripado = new String(bytesDesencriptados);
-
-                System.out.println("TEXTO DESENCRIPTADO:");
-                System.out.println(textoDesencripado);
                 
-                
+                //Separo el string por cada #
                 String[] numeros = textoDesencripado.split("#");
+                
                 monitor.setjTextField1(numeros[0]);
                 monitor.setjTextField2(numeros[1]);
-                monitor.setjTextField2(numeros[2]);
+                monitor.setjTextField3(numeros[2]);
 
             }
 
